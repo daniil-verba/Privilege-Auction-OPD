@@ -1,5 +1,6 @@
 #pragma once
 #include "types.hpp"
+#include <memory>
 #include <string>
 
 namespace pa {
@@ -9,27 +10,42 @@ public:
     Engine();
     ~Engine();
 
-    // Запрещаем копирование для простоты (можно добавить при необходимости)
     Engine(const Engine&) = delete;
     Engine& operator=(const Engine&) = delete;
+    Engine(Engine&&) noexcept;
+    Engine& operator=(Engine&&) noexcept;
 
-    // --- Пользователи ---
-    UserId add_user(const std::string& name, Points initial_balance);
+    // Пользователи
+    UserId add_user(std::string name, Points initial_balance);
     Points get_balance(UserId user) const;
 
-    // --- Задачи ---
-    TaskId add_task(const std::string& description, Points base_price);
-    Points get_current_price(TaskId task, UserId user) const; // Здесь будет формула K1*K2*K3
-    bool assign_task(TaskId task, UserId user);
+    // Задачи
+    TaskId add_task(std::string description,
+                    TaskRank rank,
+                    Points base_price,
+                    TaskComplexity complexity,
+                    Timestamp planned_time,
+                    Timestamp deadline);
 
-    // --- Аукцион ---
-    AuctionId start_auction(TaskId task, Points start_price);
+    Points calculate_final_score(TaskId task,
+                                 Timestamp actual_completion_time,
+                                 int attempts_made) const;
+
+    bool assign_task(TaskId task, UserId user,
+                     Timestamp actual_completion_time,
+                     int attempts_made);
+
+    // Аукцион
+    AuctionId start_auction(PrivilegeId privilege,
+                            Points cost_price,
+                            size_t slots,
+                            size_t interested_count);
     bool place_bid(AuctionId auction, UserId user, Points amount);
-    UserId close_auction(AuctionId auction); // Возвращает ID победителя
+    UserId close_auction(AuctionId auction);
 
 private:
     struct Impl;
-    Impl* pimpl; // Скрываем всю внутреннюю логику и поля здесь
+    std::unique_ptr<Impl> pimpl_;
 };
 
 } // namespace pa

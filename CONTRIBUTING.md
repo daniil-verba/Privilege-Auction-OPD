@@ -6,18 +6,36 @@
 
 ## 🚀 Getting Started
 
+### 1. Fork and clone
+Click the "Fork" button on GitHub.com, then open your terminal:
+
 ```bash
-# 1. Fork and clone
-# Click the "Fork" button on GitHub.com, then open your terminal:
 git clone https://github.com/<YOUR-USERNAME>/Privilege-Auction-OPD.git
 cd Privilege-Auction-OPD
+```
 
-# 2. Add upstream remote to sync with the main repository
+### 2. Add upstream remote to sync with the main repository
+
+```bash
 git remote add upstream https://github.com/IceMan4ik/Privilege-Auction-OPD.git
+```
 
-# 3. Setup Environment
-# Follow the setup instructions in the main README.md 
-# (install dependencies, build the project, etc., based on the chosen tech stack)
+### 3. Setup Environment & Building the Project
+The project is built using **CMake**. Follow the instructions below depending on your OS:
+
+**Windows (cmd):**
+```cmd
+mkdir build
+cd build
+cmake ..
+cmake --build . --config Release
+```
+
+**Linux (bash):**
+```bash
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build . -j$(nproc)
 ```
 
 ---

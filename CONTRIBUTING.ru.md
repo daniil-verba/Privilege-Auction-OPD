@@ -6,18 +6,36 @@
 
 ## 🚀 Начало работы
 
+### 1. Форк и клонирование
+Нажмите кнопку "Fork" на GitHub.com, затем откройте терминал:
+
 ```bash
-# 1. Форк и клонирование
-# Нажмите кнопку "Fork" на GitHub.com, затем откройте терминал:
 git clone https://github.com/<ВАШ_НИКНЕЙМ>/Privilege-Auction-OPD.git
 cd Privilege-Auction-OPD
+```
 
-# 2. Добавьте upstream для синхронизации с основным репозиторием
+### 2. Добавьте upstream для синхронизации с основным репозиторием
+
+```bash
 git remote add upstream https://github.com/IceMan4ik/Privilege-Auction-OPD.git
+```
 
-# 3. Настройка окружения
-# Следуйте инструкциям в основном README.md 
-# (установка зависимостей, сборка проекта и т.д. в зависимости от выбранного стека)
+### 3. Настройка окружения и сборка проекта
+Проект собирается с помощью **CMake**. Следуйте инструкциям ниже в зависимости от вашей ОС:
+
+**Windows (cmd):**
+```cmd
+mkdir build
+cd build
+cmake ..
+cmake --build . --config Release
+```
+
+**Linux (bash):**
+```bash
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build . -j$(nproc)
 ```
 
 ---

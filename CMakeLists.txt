@@ -18,7 +18,7 @@ include(FetchContent)
 # </CPM_DEPENDENCIES_END>
 
 set(SOURCES
-    src/main.cpp
+    src/engine.cpp
     # src/algorithm.cpp
     # src/auction.cpp
     # src/pricing.cpp
@@ -31,6 +31,13 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
+
+# Добавляем демо для cls тестов
+add_executable(pa_demo example/main.cpp)
+
+# Линкуем нашу библиотеку с демо-приложением!
+# PRIVATE означает, что pa_demo использует либу, но не передает её дальше
+target_link_libraries(pa_demo PRIVATE ${PROJECT_NAME})
 
 # <CPM_LINK_START>
 # </CPM_LINK_START>

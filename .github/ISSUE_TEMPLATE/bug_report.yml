@@ -1,0 +1,78 @@
+name: Bug report
+description: Сообщить об ошибке в библиотеке, сборке или документации
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо за отчёт. Пожалуйста, заполните поля ниже — так проблему будет проще воспроизвести.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Описание проблемы
+      description: Что произошло и какого поведения вы ожидали?
+      placeholder: При вызове ... происходит ..., хотя ожидалось ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Шаги воспроизведения
+      description: Минимальная последовательность действий или код, который приводит к ошибке
+      placeholder: |
+        1. Собрать проект командой ...
+        2. Запустить ...
+        3. Получить ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Операционная система
+      options:
+        - Linux
+        - Windows
+        - macOS
+        - Другая
+    validations:
+      required: true
+
+  - type: input
+    id: compiler
+    attributes:
+      label: Компилятор и версия
+      placeholder: GCC 13.2 / MSVC 19.40 / Clang 18
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Версия или коммит
+      description: Тег релиза либо SHA коммита
+      placeholder: v1.0.0 / abc1234
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Логи и вывод
+      description: Вывод сборки, ошибка компилятора или минимальный воспроизводимый пример
+      render: shell
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Проверки
+      options:
+        - label: Я поискал(а) похожие issues и не нашёл(ла) дубликат
+          required: true
+        - label: Проблема воспроизводится на актуальной ветке dev
+          required: false

@@ -42,6 +42,10 @@ add_executable(pa_demo example/main.cpp)
 target_link_libraries(pa_demo PRIVATE ${PROJECT_NAME})
 
 if(BUILD_TESTING)
+    add_executable(pa_tests tests/test_engine.cpp)
+    target_link_libraries(pa_tests PRIVATE ${PROJECT_NAME})
+
+    add_test(NAME pa_tests COMMAND pa_tests)
     add_test(NAME pa_demo COMMAND pa_demo)
 endif()
 

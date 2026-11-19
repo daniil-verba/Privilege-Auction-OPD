@@ -2,6 +2,7 @@
 #include "types.hpp"
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace pa {
 
@@ -41,7 +42,7 @@ public:
                             size_t slots,
                             size_t interested_count);
     bool place_bid(AuctionId auction, UserId user, Points amount);
-    UserId close_auction(AuctionId auction);
+    std::vector<UserId> close_auction(AuctionId auction);
 
 private:
     struct Impl;

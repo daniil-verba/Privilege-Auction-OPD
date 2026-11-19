@@ -66,6 +66,16 @@ inline Points rank_max_base_price(TaskRank r) noexcept {
     return 0;
 }
 
+inline Points rank_min_base_price(TaskRank r) noexcept {
+    switch (r) {
+        case TaskRank::D: return 0;
+        case TaskRank::C: return 51;
+        case TaskRank::B: return 201;
+        case TaskRank::A: return 501;
+    }
+    return 0;
+}
+
 // Коэффициент «Силы» (K2)
 struct TaskComplexity {
     double volume;

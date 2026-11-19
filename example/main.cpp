@@ -11,6 +11,7 @@
 #include <chrono>
 #include <thread>
 #include <iomanip>
+#include <vector>
 
 // Единая точка входа в библиотеку
 #include "pa/pa.hpp"
@@ -125,22 +126,31 @@ int main() {
         std::cout << "Alice ставит 600: " << (bid1 ? "OK" : "Отклонено") 
                   << " (Баланс Alice: " << engine.get_balance(alice) << ")\n";
 
-        // Bob перебивает ставкой 700. Alice получает возврат 600.
+        // Bob делает ставку 700. Оба участника пока в пределах двух слотов.
         bool bid2 = engine.place_bid(auction, bob, 700);
         std::cout << "Bob ставит 700: " << (bid2 ? "OK" : "Отклонено") 
-                  << " (Баланс Bob: " << engine.get_balance(bob) << ", Баланс Alice вернется к " << engine.get_balance(alice) << ")\n";
+                  << " (Баланс Bob: " << engine.get_balance(bob) << ", Баланс Alice: " << engine.get_balance(alice) << ")\n";
 
-        // Alice пытается поставить 650 (меньше текущей ставки 700) - должно быть отклонено
+        // Alice повышает свою ставку до 650 и остается во втором слоте
         bool bid3 = engine.place_bid(auction, alice, 650);
-        std::cout << "Alice ставит 650 (меньше текущей): " << (bid3 ? "OK" : "ОТКЛОНЕНО (правило аукциона)") << "\n";
+        std::cout << "Alice повышает ставку до 650: " << (bid3 ? "OK" : "Отклонено")
+                  << " (Баланс Alice: " << engine.get_balance(alice) << ")\n";
+
+        // Попытка сделать ставку без достаточного баланса до закрытия аукциона
+        bool bad_bid = engine.place_bid(auction, alice, 99999);
+        std::cout << "Попытка ставки 99999: " << (bad_bid ? "OK" : "Отклонено (недостаточно средств)") << "\n";
 
         // Закрытие аукциона
-        UserId winner = engine.close_auction(auction);
+        std::vector<UserId> winners = engine.close_auction(auction);
         
         std::cout << "\n--- Результаты аукциона ---\n";
-        std::cout << "Победитель ID: " << winner.value << " (Bob)\n";
+        std::cout << "Победители:";
+        for (const UserId winner : winners) {
+            std::cout << " " << winner.value;
+        }
+        std::cout << " (Bob, Alice)\n";
         std::cout << "Финальный баланс Bob: " << engine.get_balance(bob) << " (списано 700)\n";
-        std::cout << "Финальный баланс Alice: " << engine.get_balance(alice) << " (возврат после перебития ставки)\n";
+        std::cout << "Финальный баланс Alice: " << engine.get_balance(alice) << " (списано 650)\n";
 
 
         print_separator("4. ОБРАБОТКА ОШИБОК И ГРАНИЧНЫХ СЛУЧАЕВ");
@@ -153,10 +163,10 @@ int main() {
             std::cout << "Перехвачено исключение: " << e.what() << "\n";
         }
 
-        // Попытка сделать ставку без денег
-        std::cout << "Попытка ставки без достаточного баланса...\n";
-        bool bad_bid = engine.place_bid(auction, alice, 99999);
-        std::cout << "Результат: " << (bad_bid ? "OK" : "Отклонено (недостаточно средств)") << "\n";
+        // Попытка сделать ставку после закрытия аукциона
+        std::cout << "Попытка ставки после закрытия аукциона...\n";
+        bool late_bid = engine.place_bid(auction, alice, 700);
+        std::cout << "Результат: " << (late_bid ? "OK" : "Отклонено (аукцион закрыт)") << "\n";
 
         std::cout << "\n[SUCCESS] Пример работы библиотеки завершен.\n";
         return 0;

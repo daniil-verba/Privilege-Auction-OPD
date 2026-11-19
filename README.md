@@ -13,6 +13,7 @@ C++ library for gamification systems with **dynamic task pricing** and **privile
 - Pimpl-based `Engine` — stable ABI, hide implementation
 - Formulas from the spec: `Score = Base + (M × K₁ × K₂ × K₃) − Penalty`
 - Auction with auto-calculated starting price: `Cost × Demand × Rarity`
+- Multi-slot English auctions with automatic refunds for displaced bidders
 
 ---
 
@@ -60,8 +61,12 @@ int main() {
     );
     engine.place_bid(auction, alice, 600);
     engine.place_bid(auction, bob,   700);
-    auto winner = engine.close_auction(auction);
-    std::cout << "Winner: " << winner.value << "\n";  // Bob (ID=2)
+    auto winners = engine.close_auction(auction);
+    std::cout << "Winners:";
+    for (const auto& winner : winners) {
+        std::cout << " " << winner.value;  // Bob (ID=2), Alice (ID=1)
+    }
+    std::cout << "\n";
 }
 ```
 
@@ -121,24 +126,28 @@ All public types live in namespace `pa::`.
 | Concept | What it does |
 |---|---|
 | `pa::Engine` | Main facade. Owns users, tasks, auctions. Thread-unsafe — one instance per "room". |
-| `TaskRank` (D/C/B/A) | Determines multiplier **M** (1/3/5/10) and validates base price range. |
-| `TaskComplexity` | Weighted sum of volume/difficulty/risk (weights must sum to 1.0). This is **K₂**. |
-| `calculate_final_score()` | Applies the full formula: `Base + (M·K₁·K₂·K₃) − Penalty`. |
-| `start_auction()` | Auto-computes starting price from cost, slots, and interested count. |
-| `place_bid()` / `close_auction()` | English auction. Previous bidder gets a refund; winner pays their max bid. |
+| `TaskRank` (D/C/B/A) | Determines multiplier **M** (1/3/5/10) and validates the base price range: D 0–50, C 51–200, B 201–500, A ≥ 501. |
+| `TaskComplexity` | Weighted sum of volume/difficulty/risk. Values are 1–5, weights are 0–1 and must sum to 1.0. This is **K₂**. |
+| `calculate_final_score()` | Applies the full formula: `Base + (M·K₁·K₂·K₃) − Penalty`. Attempts must be ≥ 1; completion cannot precede the task start. |
+| `assign_task()` | Completes a task once and credits the calculated score to the user's balance. |
+| `start_auction()` | Auto-computes starting price from cost, slots, and interested count. `slots` must be at least 1. |
+| `place_bid()` / `close_auction()` | English auction. Bids must reach the starting price; once all slots are filled, a new bid must beat the lowest winning bid. Displaced bidders are refunded. `close_auction()` returns the winners. |
 
 ### Pricing formula
 
 ```
+T_plan = deadline − planned_time
+T_fact = actual_completion_time − planned_time
+
 Score = Base + (M × K₁ × K₂ × K₃) − Penalty
 
 K₁ (time)     = min(3.0, T_plan / T_fact)
 K₂ (strength) = w_vol·vol + w_diff·diff + w_risk·risk   (rounded to 0.1)
-K₃ (attempts) = 1 − 0.15·(n−1),  n ≤ 5,  floor 0.25
+K₃ (attempts) = 1 − 0.15·(n−1),  n capped at 5
 M (rank)      = 1 (D) / 3 (C) / 5 (B) / 10 (A)
 Penalty       = 0 if T_fact ≤ T_plan
-                15% of bonus for rank D
-                min(90% of bonus, bonus·delay_ratio) otherwise
+                Base × 0.15 for rank D
+                Base × min(0.9, sqrt((T_fact − T_plan) / T_plan)) otherwise
 ```
 
 ### Auction formula
@@ -149,6 +158,8 @@ Demand     = min(interested / slots, 3) + 1
 Rarity     = 1 + 1 / slots
 ```
 
+An auction has `slots` winning places. When all places are filled, a new bid must exceed the current lowest winning bid; the displaced bidder is refunded immediately.
+
 ---
 
 ## 📚 Documentation
@@ -156,6 +167,7 @@ Rarity     = 1 + 1 / slots
 - 📖 [Contributing Guidelines](CONTRIBUTING.md) — Git workflow, branch naming, PR rules.
 - 📝 [Changelog](CHANGELOG.md) — Version history.
 - 🛠️ [Development Docs](docs/) — Internal guides, architecture notes.
+- 📐 [Scoring and Auction Formulas](docs/scoring.md) — Full mathematical specification.
 - 💡 [Full example](example/main.cpp) — Runnable demo with all features.
 
 ---

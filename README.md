@@ -2,6 +2,18 @@
 
 🇬🇧 [English](README.md) | 🇷🇺 [Русский](README.ru.md)
 
+<p align="center">
+  <img src="docs/assets/banner.svg" alt="Privilege Auction banner" width="100%">
+</p>
+
+<p align="center">
+  <a href="https://github.com/Privilege-Auction/Privilege-Auction-OPD/actions/workflows/ci.yml">
+    <img src="https://github.com/Privilege-Auction/Privilege-Auction-OPD/actions/workflows/ci.yml/badge.svg?branch=dev" alt="CI">
+  </a>
+  <img src="https://img.shields.io/badge/C%2B%2B-17-blue" alt="C++17">
+  <img src="https://img.shields.io/badge/CMake-3.14%2B-064F8C" alt="CMake 3.14+">
+</p>
+
 ---
 
 ## About
